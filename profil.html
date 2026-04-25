@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mon Profil — GameVault</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/catalogue.css">
+</head>
+<body>
+
+  <nav class="navbar">
+    <div class="nav-logo">🎮 GameVault</div>
+    <ul class="nav-links">
+      <li><a href="index.html">Accueil</a></li>
+      <li><a href="catalogue.html">Catalogue</a></li>
+      <li><a href="ajouter-jeu.html">Ajouter</a></li>
+      <li><a href="profil.html" class="active">Mon Profil</a></li>
+    </ul>
+  </nav>
+
+  <main class="profil-main">
+
+    <section class="profil-card">
+      <div class="profil-avatar" id="profil-avatar">🎮</div>
+      <div class="profil-infos">
+        <h1 id="profil-pseudo"></h1>
+        <p id="profil-email"></p>
+        <p id="profil-bio"></p>
+        <span class="badge badge-pc" id="profil-plateforme"></span>
+      </div>
+    </section>
+
+    <section class="favoris-section">
+      <h2>❤️ Mes jeux favoris</h2>
+      <div class="jeux-grid" id="favoris-grid">
+        <p class="chargement">⏳ Chargement...</p>
+      </div>
+      <p id="favoris-vide" style="display:none;" class="aucun-commentaire">
+        Vous n'avez pas encore de jeux favoris.
+      </p>
+    </section>
+
+    <section class="modifier-profil">
+      <h2>✏️ Modifier mon profil</h2>
+
+      <div class="csrf-info">
+        <div class="csrf-scenario">
+          <h3>🔐 Protection CSRF active</h3>
+          <p>
+            Un jeton CSRF est généré et vérifié à chaque modification.
+            Sans ce jeton, une page malveillante ne peut pas modifier votre profil.
+          </p>
+          <div class="csrf-token-affiche">
+            <span>Token de session :</span>
+            <code id="csrf-token-visible"></code>
+          </div>
+        </div>
+      </div>
+
+      <input type="hidden" id="csrf-token" name="_csrf" value="">
+
+      <form id="form-profil" novalidate>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="profil-pseudo-input">Pseudo *</label>
+            <input type="text" id="profil-pseudo-input" name="pseudo"
+                   required minlength="2" maxlength="40">
+            <span class="erreur" id="err-pseudo"></span>
+          </div>
+          <div class="form-group">
+            <label for="profil-avatar-input">Avatar (emoji)</label>
+            <input type="text" id="profil-avatar-input" name="avatar" maxlength="5">
+            <span class="erreur" id="err-avatar"></span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="profil-email-input">Email *</label>
+          <input type="email" id="profil-email-input" name="email" required>
+          <span class="erreur" id="err-email"></span>
+        </div>
+
+        <div class="form-group">
+          <label for="profil-bio-input">Bio</label>
+          <textarea id="profil-bio-input" name="bio" rows="3"
+                    placeholder="Parlez de vous..."
+                    maxlength="200"></textarea>
+          <span class="erreur" id="err-bio"></span>
+        </div>
+
+        <div class="form-group">
+          <label for="profil-plateforme-input">Plateforme favorite</label>
+          <select id="profil-plateforme-input" name="plateforme">
+            <option value="PC">💻 PC</option>
+            <option value="PS5">🎮 PS5</option>
+            <option value="Xbox">🟩 Xbox</option>
+            <option value="Switch">🔴 Switch</option>
+            <option value="Mobile">📱 Mobile</option>
+          </select>
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary">💾 Enregistrer</button>
+        </div>
+
+        <div id="profil-succes" class="message-succes" style="display:none;">
+          ✅ Profil mis à jour !
+        </div>
+        <div id="profil-csrf-error" class="csrf-error" style="display:none;">
+          🚨 Erreur CSRF : token invalide !
+        </div>
+      </form>
+    </section>
+
+  </main>
+
+  <footer class="footer">
+    <p>© 2025 GameVault — Projet Web sécurisé B2</p>
+  </footer>
+
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/catalogue.js"></script>
+  <script src="js/profil.js"></script>
+
+</body>
+</html>

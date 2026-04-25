@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Catalogue — GameVault</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/catalogue.css">
+</head>
+<body>
+
+  <nav class="navbar">
+    <div class="nav-logo">🎮 GameVault</div>
+    <ul class="nav-links">
+      <li><a href="index.html">Accueil</a></li>
+      <li><a href="catalogue.html" class="active">Catalogue</a></li>
+      <li><a href="ajouter-jeu.html">Ajouter</a></li>
+      <li><a href="profil.html">Mon Profil</a></li>
+    </ul>
+  </nav>
+
+  <main class="catalogue-main">
+    <h1>🎮 Catalogue des jeux</h1>
+
+    <div class="recherche-wrapper">
+      <div class="recherche-box">
+        <span class="recherche-icon">🔍</span>
+        <input
+          type="text"
+          id="recherche"
+          placeholder="Rechercher un jeu, un genre, un développeur..."
+          maxlength="100"
+          autocomplete="off"
+        >
+        <button class="btn-clear" id="btn-clear" onclick="clearRecherche()">✕</button>
+      </div>
+
+      <div class="sql-demo" id="sql-demo" style="display:none;">
+        <div class="sql-tabs">
+          <button class="sql-tab sql-tab-actif" onclick="changerSQLTab('vulnerable')">
+            ❌ Requête vulnérable
+          </button>
+          <button class="sql-tab" onclick="changerSQLTab('secure')">
+            ✅ Requête sécurisée
+          </button>
+        </div>
+        <div class="sql-code" id="sql-code"></div>
+        <div class="sql-warning" id="sql-warning" style="display:none;">
+          🚨 Injection SQL détectée !
+        </div>
+      </div>
+    </div>
+
+    <div class="filtres">
+      <select id="filtre-genre">
+        <option value="">🎭 Tous les genres</option>
+        <option value="action">⚔️ Action</option>
+        <option value="rpg">🧙 RPG</option>
+        <option value="fps">🔫 FPS</option>
+        <option value="sport">⚽ Sport</option>
+        <option value="course">🏎️ Course</option>
+        <option value="strategie">♟️ Stratégie</option>
+        <option value="aventure">🗺️ Aventure</option>
+        <option value="simulation">🏙️ Simulation</option>
+      </select>
+
+      <select id="filtre-plateforme">
+        <option value="">🖥️ Toutes plateformes</option>
+        <option value="PC">💻 PC</option>
+        <option value="PS5">🎮 PS5</option>
+        <option value="PS4">🎮 PS4</option>
+        <option value="Xbox">🟩 Xbox</option>
+        <option value="Switch">🔴 Switch</option>
+        <option value="Mobile">📱 Mobile</option>
+      </select>
+
+      <select id="filtre-note">
+        <option value="">⭐ Toute note</option>
+        <option value="4">⭐ 4+ étoiles</option>
+        <option value="3">⭐ 3+ étoiles</option>
+        <option value="2">⭐ 2+ étoiles</option>
+      </select>
+
+      <select id="filtre-tri">
+        <option value="recent">📅 Plus récents</option>
+        <option value="note">⭐ Mieux notés</option>
+        <option value="titre">🔤 Alphabétique</option>
+      </select>
+    </div>
+
+    <div class="resultats-header">
+      <p id="nb-resultats" class="nb-resultats"></p>
+    </div>
+
+    <div class="jeux-grid" id="jeux-grid">
+      <p class="chargement">⏳ Chargement des jeux...</p>
+    </div>
+
+    <div id="message-vide" class="message-vide" style="display:none;">
+      <div class="vide-emoji">🕹️</div>
+      <p>Aucun jeu trouvé</p>
+      <a href="ajouter-jeu.html" class="btn btn-primary">➕ Ajouter un jeu</a>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <p>© 2025 GameVault — Projet Web sécurisé B2</p>
+  </footer>
+
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/catalogue.js"></script>
+
+</body>
+</html>

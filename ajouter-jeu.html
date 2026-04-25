@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ajouter un jeu — GameVault</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <nav class="navbar">
+    <div class="nav-logo">🎮 GameVault</div>
+    <ul class="nav-links">
+      <li><a href="index.html">Accueil</a></li>
+      <li><a href="catalogue.html">Catalogue</a></li>
+      <li><a href="ajouter-jeu.html" class="active">Ajouter</a></li>
+      <li><a href="profil.html">Mon Profil</a></li>
+    </ul>
+  </nav>
+
+  <main class="form-main">
+    <h1>➕ Ajouter un jeu</h1>
+
+    <form id="form-jeu" novalidate>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="titre">Titre du jeu *</label>
+          <input type="text" id="titre" name="titre"
+                 placeholder="Ex : Cyberpunk 2077"
+                 required minlength="2" maxlength="100">
+          <span class="erreur" id="err-titre"></span>
+        </div>
+        <div class="form-group">
+          <label for="annee">Année de sortie *</label>
+          <input type="number" id="annee" name="annee"
+                 placeholder="Ex : 2024"
+                 required min="1970" max="2030">
+          <span class="erreur" id="err-annee"></span>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="genre">Genre *</label>
+          <select id="genre" name="genre" required>
+            <option value="">-- Choisir --</option>
+            <option value="action">⚔️ Action</option>
+            <option value="rpg">🧙 RPG</option>
+            <option value="fps">🔫 FPS</option>
+            <option value="sport">⚽ Sport</option>
+            <option value="course">🏎️ Course</option>
+            <option value="strategie">♟️ Stratégie</option>
+            <option value="aventure">🗺️ Aventure</option>
+            <option value="simulation">🏙️ Simulation</option>
+          </select>
+          <span class="erreur" id="err-genre"></span>
+        </div>
+        <div class="form-group">
+          <label for="plateforme">Plateforme *</label>
+          <select id="plateforme" name="plateforme" required>
+            <option value="">-- Choisir --</option>
+            <option value="PC">💻 PC</option>
+            <option value="PS5">🎮 PS5</option>
+            <option value="PS4">🎮 PS4</option>
+            <option value="Xbox">🟩 Xbox</option>
+            <option value="Switch">🔴 Switch</option>
+            <option value="Mobile">📱 Mobile</option>
+          </select>
+          <span class="erreur" id="err-plateforme"></span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="developpeur">Développeur *</label>
+        <input type="text" id="developpeur" name="developpeur"
+               placeholder="Ex : CD Projekt Red"
+               required minlength="2" maxlength="80">
+        <span class="erreur" id="err-developpeur"></span>
+      </div>
+
+      <div class="form-group">
+        <label>Difficulté *</label>
+        <div class="radio-group">
+          <label>
+            <input type="radio" name="difficulte" value="Facile" required>
+            🟢 Facile
+          </label>
+          <label>
+            <input type="radio" name="difficulte" value="Moyen">
+            🟡 Moyen
+          </label>
+          <label>
+            <input type="radio" name="difficulte" value="Difficile">
+            🔴 Difficile
+          </label>
+        </div>
+        <span class="erreur" id="err-difficulte"></span>
+      </div>
+
+      <div class="form-group">
+        <label for="image">Image du jeu</label>
+        <div class="image-upload-wrapper">
+          <input type="file" id="image" name="image"
+                 accept="image/jpeg, image/png, image/webp">
+          <div class="image-preview-box">
+            <img id="image-preview"
+                 src="images/jeux/default.jpg"
+                 alt="Prévisualisation">
+          </div>
+        </div>
+        <p class="input-hint">Formats acceptés : JPG, PNG, WEBP — Max 2 Mo</p>
+        <span class="erreur" id="err-image"></span>
+      </div>
+
+      <div class="form-group">
+          <label for="lien-telechargement">🔗 Lien de téléchargement</label>
+          <input type="url" id="lien-telechargement" name="lienTelechargement"
+           placeholder="https://store.steampowered.com/..."
+           maxlength="500">
+          <p class="input-hint">Lien Steam, Epic Games, PlayStation Store, etc.</p>
+          <span class="erreur" id="err-lien"></span>
+      </div>
+      
+      <div class="form-group">
+        <label for="description">Description *</label>
+        <textarea id="description" name="description" rows="5"
+                  placeholder="Décrivez le jeu : univers, gameplay, histoire..."
+                  required minlength="20" maxlength="1000"></textarea>
+        <span class="erreur" id="err-description"></span>
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary">✅ Ajouter le jeu</button>
+        <button type="reset"  class="btn btn-secondary">🔄 Réinitialiser</button>
+        <a href="catalogue.html" class="btn btn-secondary">← Annuler</a>
+      </div>
+
+      <div id="message-succes" class="message-succes" style="display:none;">
+        ✅ Jeu ajouté avec succès !
+        <a href="catalogue.html">Voir le catalogue →</a>
+      </div>
+
+      <div id="message-chargement" class="message-chargement" style="display:none;">
+        ⏳ Sauvegarde en cours...
+      </div>
+
+    </form>
+  </main>
+
+  <footer class="footer">
+    <p>© 2025 GameVault — Projet Web sécurisé B2</p>
+  </footer>
+
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/formulaire.js"></script>
+
+</body>
+</html>

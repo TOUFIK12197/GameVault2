@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GameVault 🎮</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/catalogue.css">
+</head>
+<body>
+
+  <nav class="navbar">
+    <div class="nav-logo">🎮 GameVault</div>
+    <ul class="nav-links">
+      <li><a href="index.html" class="active">Accueil</a></li>
+      <li><a href="catalogue.html">Catalogue</a></li>
+      <li><a href="ajouter-jeu.html">Ajouter</a></li>
+      <li><a href="profil.html">Mon Profil</a></li>
+    </ul>
+  </nav>
+
+  <header class="hero">
+    <div class="hero-content">
+      <div class="hero-badge">🏆 La bibliothèque des gamers</div>
+      <h1>Votre collection de jeux<br>
+        <span class="highlight">en un seul endroit</span>
+      </h1>
+      <p>Découvrez, notez et partagez vos jeux vidéo préférés avec la communauté GameVault.</p>
+      <div class="hero-buttons">
+        <a href="catalogue.html" class="btn btn-primary">🎮 Explorer le catalogue</a>
+        <a href="ajouter-jeu.html" class="btn btn-secondary">➕ Ajouter un jeu</a>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <div class="floating-cards">
+        <div class="float-card fc-1"><img src="/GameVault/images/icons8-jeux-vidéo-100.png"></div>
+        <div class="float-card fc-2"><img src="/GameVault/images/icons8-ps-5-96.png"></div>
+        <div class="float-card fc-3"><img src="/GameVault/images/icons8-playstation-4-72.png"></div>
+        <div class="float-card fc-4"><img src="/GameVault/images/icons8-playstation-3-72.png"></div>
+        <div class="float-card fc-5"><img src="/GameVault/images/icons8-xbox-96.png"></div>
+      </div>
+    </div>
+  </header>
+
+  <section class="stats">
+    <div class="stat-card">
+      <span class="stat-number" id="nb-jeux">...</span>
+      <span class="stat-label">Jeux</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-number">8</span>
+      <span class="stat-label">Genres</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-number">6</span>
+      <span class="stat-label">Plateformes</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-number">42</span>
+      <span class="stat-label">Joueurs</span>
+    </div>
+  </section>
+
+  <section class="recentes">
+    <div class="section-header">
+      <h2>🔥 Ajouts récents</h2>
+      <a href="catalogue.html" class="voir-tout">Voir tout →</a>
+    </div>
+    <div class="jeux-grid" id="jeux-recents">
+      <p class="chargement">⏳ Chargement...</p>
+    </div>
+  </section>
+
+  <section class="categories-section">
+    <div class="section-header">
+      <h2>🎭 Parcourir par genre</h2>
+    </div>
+    <div class="categories-grid">
+      <a href="catalogue.html?genre=action"     class="categorie-card">⚔️<span>Action</span></a>
+      <a href="catalogue.html?genre=rpg"        class="categorie-card">🧙<span>RPG</span></a>
+      <a href="catalogue.html?genre=fps"        class="categorie-card">🔫<span>FPS</span></a>
+      <a href="catalogue.html?genre=sport"      class="categorie-card">⚽<span>Sport</span></a>
+      <a href="catalogue.html?genre=course"     class="categorie-card">🏎️<span>Course</span></a>
+      <a href="catalogue.html?genre=strategie"  class="categorie-card">♟️<span>Stratégie</span></a>
+      <a href="catalogue.html?genre=aventure"   class="categorie-card">🗺️<span>Aventure</span></a>
+      <a href="catalogue.html?genre=simulation" class="categorie-card">🏙️<span>Simulation</span></a>
+    </div>
+  </section>
+
+  <section class="recentes">
+    <div class="section-header">
+      <h2>⭐ Mieux notés</h2>
+      <a href="catalogue.html" class="voir-tout">Voir tout →</a>
+    </div>
+    <div class="jeux-grid" id="jeux-top">
+      <p class="chargement">⏳ Chargement...</p>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <p>© 2025 GameVault — Projet Web sécurisé B2</p>
+  </footer>
+
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/catalogue.js"></script>
+  <script>
+    initialiserDonnees(function() {
+      getJeux(function(jeux) {
+
+        // Stats
+        document.getElementById('nb-jeux').textContent = jeux.length;
+
+        // Jeux récents
+        var gridRecents = document.getElementById('jeux-recents');
+        gridRecents.innerHTML = '';
+        var recents = jeux.slice().reverse().slice(0, 3);
+        if (recents.length === 0) {
+          gridRecents.innerHTML = '<p class="chargement">Aucun jeu ajouté.</p>';
+        } else {
+          for (var i = 0; i < recents.length; i++) {
+            gridRecents.appendChild(creerCarteJeu(recents[i]));
+          }
+        }
+
+        // Top notés
+        var gridTop = document.getElementById('jeux-top');
+        gridTop.innerHTML = '';
+        var top = jeux.slice().sort(function(a, b) {
+          return b.note - a.note;
+        }).slice(0, 3);
+        if (top.length === 0) {
+          gridTop.innerHTML = '<p class="chargement">Aucun jeu noté.</p>';
+        } else {
+          for (var j = 0; j < top.length; j++) {
+            gridTop.appendChild(creerCarteJeu(top[j]));
+          }
+        }
+      });
+    });
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fiche jeu — GameVault</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/catalogue.css">
+  <link rel="stylesheet" href="css/detail.css">
+</head>
+<body>
+
+  <nav class="navbar">
+    <div class="nav-logo">🎮 GameVault</div>
+    <ul class="nav-links">
+      <li><a href="index.html">Accueil</a></li>
+      <li><a href="catalogue.html">Catalogue</a></li>
+      <li><a href="ajouter-jeu.html">Ajouter</a></li>
+      <li><a href="profil.html">Mon Profil</a></li>
+    </ul>
+  </nav>
+
+  <main class="detail-main">
+
+    <div id="jeu-introuvable" style="display:none;" class="introuvable">
+      <div>🕹️</div>
+      <p>Ce jeu n'existe pas dans notre base.</p>
+      <a href="catalogue.html" class="btn btn-primary">← Retour au catalogue</a>
+    </div>
+
+    <div id="detail-contenu" style="display:none;">
+
+      <a href="catalogue.html" class="lien-retour">← Retour au catalogue</a>
+
+      <section class="detail-header">
+        <img id="detail-image" class="detail-image"
+             src="images/jeux/default.jpg" alt="Jeu">
+        <div class="detail-infos">
+          <div class="detail-badges" id="detail-badges"></div>
+          <h1 id="detail-titre"></h1>
+          <div class="detail-meta">
+            <span>👾 <strong id="detail-dev"></strong></span>
+            <span>📅 <strong id="detail-annee"></strong></span>
+            <span>🖥️ <strong id="detail-plateforme"></strong></span>
+            <span>⭐ <strong id="detail-note"></strong>/5</span>
+            <span>💬 <strong id="detail-nb-comments"></strong> avis</span>
+          </div>
+          <p class="detail-description" id="detail-description"></p>
+          <div class="detail-actions">
+            <button id="btn-favori" class="btn btn-secondary"
+                    onclick="toggleFavoriDetail()">
+              🤍 Ajouter aux favoris
+            </button>
+            <button class="btn btn-danger" onclick="supprimerCeJeu()">
+              🗑️ Supprimer
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <section class="detail-section">
+        <h2>⭐ NOTER CE JEU</h2>
+        <div class="notation">
+          <p class="notation-label">Votre note :</p>
+          <div class="etoiles-input" id="etoiles-input">
+            <span class="etoile" onclick="noterJeu(1)">★</span>
+            <span class="etoile" onclick="noterJeu(2)">★</span>
+            <span class="etoile" onclick="noterJeu(3)">★</span>
+            <span class="etoile" onclick="noterJeu(4)">★</span>
+            <span class="etoile" onclick="noterJeu(5)">★</span>
+          </div>
+          <p id="notation-message" class="notation-message"></p>
+        </div>
+      </section>
+      
+      <!-- TÉLÉCHARGEMENT -->
+      <section class="detail-section">
+          <h2>⬇️ TÉLÉCHARGER LE JEU</h2>
+          <div class="telechargement-box" id="telechargement-box">
+          <p class="chargement">⏳ Chargement...</p>
+           </div>
+      </section>
+      
+      <section class="detail-section commentaires-section">
+        <h2>💬 AVIS DE LA COMMUNAUTÉ</h2>
+
+        <div class="xss-tabs">
+          <button class="tab-btn tab-actif" id="tab-vulnerable"
+                  onclick="changerOnglet('vulnerable')">
+            ❌ Mode vulnérable (XSS)
+          </button>
+          <button class="tab-btn" id="tab-secure"
+                  onclick="changerOnglet('secure')">
+            ✅ Mode sécurisé
+          </button>
+        </div>
+
+        <div id="bandeau-vulnerable" class="bandeau-vulnerable">
+          ⚠️ <strong>Démonstration XSS</strong> — Mode non protégé actif.
+          Testez : <code>&lt;img src="x" onerror="alert('XSS!')"&gt;</code>
+        </div>
+        <div id="bandeau-secure" class="bandeau-secure" style="display:none;">
+          ✅ <strong>Mode sécurisé</strong> — <code>textContent</code> utilisé.
+          Le code HTML est affiché comme texte brut.
+        </div>
+
+        <form id="form-commentaire" novalidate>
+          <div class="form-group">
+            <label for="comment-auteur">Pseudo *</label>
+            <input type="text" id="comment-auteur"
+                   placeholder="Votre pseudo..."
+                   required minlength="2" maxlength="40">
+            <span class="erreur" id="err-auteur"></span>
+          </div>
+          <div class="form-group">
+            <label for="comment-texte">Votre avis *</label>
+            <textarea id="comment-texte" rows="3"
+                      placeholder="Partagez votre expérience..."
+                      required minlength="5" maxlength="500"></textarea>
+            <div class="form-footer-row">
+              <span class="erreur" id="err-texte"></span>
+              <span class="compteur" id="compteur">0 / 500</span>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary">
+            📨 Publier mon avis
+          </button>
+        </form>
+
+        <div id="chargement-comments" class="chargement">
+          ⏳ Chargement des avis...
+        </div>
+        <div class="commentaires-liste" id="commentaires-liste"></div>
+        <p id="aucun-commentaire" class="aucun-commentaire" style="display:none;">
+          🎮 Soyez le premier à donner votre avis !
+        </p>
+      </section>
+
+    </div>
+  </main>
+
+  <footer class="footer">
+    <p>© 2025 GameVault — Projet Web sécurisé B2</p>
+  </footer>
+
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/catalogue.js"></script>
+  <script src="js/jeu.js"></script>
+
+</body>
+</html>
