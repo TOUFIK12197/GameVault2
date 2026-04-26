@@ -44,7 +44,53 @@ function connexionAnonyme(callback) {
     });
 }
 
-connexionAnonyme(function() {});
+function inscrireUtilisateur(email, motDePasse, callback) {
+  if (!auth) {
+    if (callback) callback(null, new Error('Firebase Auth non initialisé.'));
+    return;
+  }
+  auth.createUserWithEmailAndPassword(email, motDePasse)
+    .then(function(userCredential) {
+      console.log('Inscription réussie', userCredential.user.uid);
+      if (callback) callback(userCredential.user, null);
+    })
+    .catch(function(error) {
+      console.error('Erreur inscription Firebase :', error);
+      if (callback) callback(null, error);
+    });
+}
+
+function connexionUtilisateur(email, motDePasse, callback) {
+  if (!auth) {
+    if (callback) callback(null, new Error('Firebase Auth non initialisé.'));
+    return;
+  }
+  auth.signInWithEmailAndPassword(email, motDePasse)
+    .then(function(userCredential) {
+      console.log('Connexion réussie', userCredential.user.uid);
+      if (callback) callback(userCredential.user, null);
+    })
+    .catch(function(error) {
+      console.error('Erreur de connexion Firebase :', error);
+      if (callback) callback(null, error);
+    });
+}
+
+function deconnexionUtilisateur(callback) {
+  if (!auth) {
+    if (callback) callback(new Error('Firebase Auth non initialisé.'));
+    return;
+  }
+  auth.signOut()
+    .then(function() {
+      console.log('Déconnexion réussie');
+      if (callback) callback(null);
+    })
+    .catch(function(error) {
+      console.error('Erreur de déconnexion Firebase :', error);
+      if (callback) callback(error);
+    });
+}
 
 // ============================================================
 //  Profils Firestore
