@@ -92,6 +92,7 @@ function demarrerFirebaseAuth() {
     }
 
     setAuthentificationUI(user);
+    afficherFavoris();
     migrerProfilLocalStorage(user.uid, function() {
       getProfilFirestore(user.uid, function(profil) {
         if (!profil) {
@@ -225,6 +226,7 @@ document.addEventListener('DOMContentLoaded', function() {
           return;
         }
         afficherMessageConnexion('Connexion réussie.', false);
+        afficherFavoris();
       });
     });
   }
@@ -243,6 +245,7 @@ document.addEventListener('DOMContentLoaded', function() {
           return;
         }
         afficherMessageConnexion('Compte créé. Vous êtes connecté.', false);
+        afficherFavoris();
       });
     });
   }
@@ -255,6 +258,7 @@ document.addEventListener('DOMContentLoaded', function() {
           return;
         }
         afficherMessageConnexion('Déconnecté.', false);
+        afficherFavoris();
       });
     });
   }
