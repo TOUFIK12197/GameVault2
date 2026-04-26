@@ -88,28 +88,30 @@ function demarrerFirebaseAuth() {
 }
 
 function afficherFavoris() {
-  var jeux    = getJeux();
-  var favoris = [];
-
-  for (var i = 0; i < jeux.length; i++) {
-    if (jeux[i].favoris) favoris.push(jeux[i]);
-  }
-
   var grid  = document.getElementById('favoris-grid');
   var vide  = document.getElementById('favoris-vide');
-
   if (!grid) return;
 
-  if (favoris.length === 0) {
-    if (vide) vide.style.display = 'block';
-    return;
-  }
+  getJeux(function(jeux) {
+    var favoris = [];
 
-  if (vide) vide.style.display = 'none';
+    for (var i = 0; i < jeux.length; i++) {
+      if (jeux[i].favoris) favoris.push(jeux[i]);
+    }
 
-  for (var j = 0; j < favoris.length; j++) {
-    grid.appendChild(creerCarteJeu(favoris[j]));
-  }
+    if (favoris.length === 0) {
+      if (vide) vide.style.display = 'block';
+      grid.innerHTML = '';
+      return;
+    }
+
+    if (vide) vide.style.display = 'none';
+    grid.innerHTML = '';
+
+    for (var j = 0; j < favoris.length; j++) {
+      grid.appendChild(creerCarteJeu(favoris[j]));
+    }
+  });
 }
 
 // ============================================================
