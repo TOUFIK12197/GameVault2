@@ -46,7 +46,6 @@ service cloud.firestore {
         && request.resource.data.bio.size() <= 200
         && request.resource.data.plateforme is string
         && request.resource.data.plateforme in ['PC','PS5','PS4','Xbox','Switch','Mobile'];
->>>>>>> 78e3417 (Mise à jour du profil Firestore et des règles Firestore)
     }
   }
 }
