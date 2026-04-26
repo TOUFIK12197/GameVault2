@@ -47,6 +47,64 @@ function connexionAnonyme(callback) {
 connexionAnonyme(function() {});
 
 // ============================================================
+//  Profils Firestore
+// ============================================================
+function getProfilFirestore(uid, callback) {
+  db.collection('utilisateurs').doc(uid).get()
+    .then(function(doc) {
+      if (doc.exists) {
+        callback(doc.data());
+      } else {
+        callback(null);
+      }
+    })
+    .catch(function(err) {
+      console.error('Erreur getProfilFirestore:', err);
+      callback(null);
+    });
+}
+
+function sauvegarderProfilFirestore(uid, profil, callback) {
+  db.collection('utilisateurs').doc(uid).set(profil, { merge: true })
+    .then(function() {
+      if (callback) callback();
+    })
+    .catch(function(err) {
+      console.error('Erreur sauvegarderProfilFirestore:', err);
+      if (callback) callback(err);
+    });
+}
+
+function migrerProfilLocalStorage(uid, callback) {
+  var profilTexte = localStorage.getItem('gamevault_profil');
+  if (!profilTexte) {
+    if (callback) callback();
+    return;
+  }
+
+  var profil;
+  try {
+    profil = JSON.parse(profilTexte);
+  } catch (err) {
+    localStorage.removeItem('gamevault_profil');
+    if (callback) callback();
+    return;
+  }
+
+  profil = profil || {};
+  profil.pseudo = profil.pseudo || 'GamerPro';
+  profil.email = profil.email || '';
+  profil.avatar = profil.avatar || '🎮';
+  profil.plateforme = profil.plateforme || 'PC';
+  profil.bio = profil.bio || '';
+
+  sauvegarderProfilFirestore(uid, profil, function() {
+    localStorage.removeItem('gamevault_profil');
+    if (callback) callback();
+  });
+}
+
+// ============================================================
 //  Jeux par défaut
 // ============================================================
 var JEUX_PAR_DEFAUT = [
@@ -286,14 +344,16 @@ function toggleFavori(id, callback) {
 //  Ajouter un commentaire
 // ============================================================
 function ajouterCommentaire(jeuId, commentaire, callback) {
+  var user = auth.currentUser;
   getJeuById(jeuId, function(jeu) {
     if (jeu) {
       var commentaires = jeu.commentaires || [];
       commentaires.push({
-        id:     Date.now(),
-        auteur: commentaire.auteur,
-        texte:  commentaire.texte,
-        date:   new Date().toLocaleDateString('fr-FR')
+        id:       Date.now(),
+        auteur:   commentaire.auteur,
+        auteurId: user ? user.uid : null,
+        texte:    commentaire.texte,
+        date:     new Date().toLocaleDateString('fr-FR')
       });
       mettreAJourJeu(jeuId, { commentaires: commentaires }, function() {
         if (callback) callback(commentaires);
