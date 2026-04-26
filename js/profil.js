@@ -16,14 +16,9 @@ function genererCSRFToken() {
 
 var SESSION_TOKEN = genererCSRFToken();
 
-// ============================================================
-//  Affichage du profil
-// ============================================================
-function afficherProfil() {
-  var profil = getProfil();
+function afficherProfilData(profil) {
   if (!profil) return;
 
-  // textContent = affichage sécurisé
   var avatarEl = document.getElementById('profil-avatar');
   var pseudoEl = document.getElementById('profil-pseudo');
   var emailEl  = document.getElementById('profil-email');
@@ -36,7 +31,6 @@ function afficherProfil() {
   if (bioEl)    bioEl.textContent    = profil.bio       || '';
   if (platEl)   platEl.textContent   = profil.plateforme || '';
 
-  // Remplir le formulaire
   var pseudoInput = document.getElementById('profil-pseudo-input');
   var avatarInput = document.getElementById('profil-avatar-input');
   var emailInput  = document.getElementById('profil-email-input');
@@ -48,12 +42,15 @@ function afficherProfil() {
   if (emailInput)  emailInput.value  = profil.email     || '';
   if (bioInput)    bioInput.value    = profil.bio       || '';
   if (platInput)   platInput.value   = profil.plateforme || 'PC';
+}
 
-  // Token CSRF
-  var tokenInput   = document.getElementById('csrf-token');
-  var tokenVisible = document.getElementById('csrf-token-visible');
-  if (tokenInput)   tokenInput.value       = SESSION_TOKEN;
-  if (tokenVisible) tokenVisible.textContent = SESSION_TOKEN;
+// ============================================================
+//  Affichage du profil
+// ============================================================
+function afficherProfil() {
+  var profil = getProfil();
+  if (!profil) return;
+  afficherProfilData(profil);
 }
 
 // ============================================================
@@ -64,11 +61,29 @@ function demarrerFirebaseAuth() {
   auth.onAuthStateChanged(function(user) {
     if (!user) {
       connexionAnonyme(function() {
-        afficherProfil();
+        // Auth state listener déclenchera la suite
       });
-    } else {
-      afficherProfil();
+      return;
     }
+
+    migrerProfilLocalStorage(user.uid, function() {
+      getProfilFirestore(user.uid, function(profil) {
+        if (!profil) {
+          profil = {
+            pseudo: 'GamerPro',
+            email: user.email || '',
+            bio: 'Passionné de jeux vidéo !',
+            avatar: '🎮',
+            plateforme: 'PC'
+          };
+          sauvegarderProfilFirestore(user.uid, profil, function() {
+            afficherProfilData(profil);
+          });
+        } else {
+          afficherProfilData(profil);
+        }
+      });
+    });
   });
 }
 
@@ -157,7 +172,13 @@ function validerProfil() {
 // ============================================================
 document.addEventListener('DOMContentLoaded', function() {
   demarrerFirebaseAuth();
+  afficherProfil();
   afficherFavoris();
+
+  var tokenInput   = document.getElementById('csrf-token');
+  var tokenVisible = document.getElementById('csrf-token-visible');
+  if (tokenInput)   tokenInput.value       = SESSION_TOKEN;
+  if (tokenVisible) tokenVisible.textContent = SESSION_TOKEN;
 
   var form = document.getElementById('form-profil');
   if (!form) return;
@@ -181,15 +202,23 @@ document.addEventListener('DOMContentLoaded', function() {
     var avatarInput = document.getElementById('profil-avatar-input');
     var platInput   = document.getElementById('profil-plateforme-input');
 
-    sauvegarderProfil({
+    var profil = {
       pseudo:     document.getElementById('profil-pseudo-input').value.trim(),
       avatar:     avatarInput ? avatarInput.value.trim() || '🎮' : '🎮',
       email:      document.getElementById('profil-email-input').value.trim(),
       bio:        document.getElementById('profil-bio-input').value.trim(),
       plateforme: platInput ? platInput.value : 'PC'
-    });
+    };
 
-    afficherProfil();
+    var user = typeof auth !== 'undefined' ? auth.currentUser : null;
+    if (user) {
+      sauvegarderProfilFirestore(user.uid, profil, function() {
+        afficherProfilData(profil);
+      });
+    } else {
+      sauvegarderProfil(profil);
+      afficherProfilData(profil);
+    }
 
     if (errCSRF) errCSRF.style.display = 'none';
     if (succes) {

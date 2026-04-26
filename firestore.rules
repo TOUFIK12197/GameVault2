@@ -30,5 +30,23 @@ service cloud.firestore {
       allow update, delete: if request.auth != null
         && request.auth.uid == resource.data.auteurId;
     }
+
+    match /utilisateurs/{uid} {
+      allow get: if request.auth != null && request.auth.uid == uid;
+      allow list: if false;
+      allow create, update: if request.auth != null && request.auth.uid == uid
+        && request.resource.data.pseudo is string
+        && request.resource.data.pseudo.size() >= 2
+        && request.resource.data.pseudo.size() <= 40
+        && request.resource.data.email is string
+        && request.resource.data.email.size() > 0
+        && request.resource.data.avatar is string
+        && request.resource.data.avatar.size() <= 5
+        && request.resource.data.bio is string
+        && request.resource.data.bio.size() <= 200
+        && request.resource.data.plateforme is string
+        && request.resource.data.plateforme in ['PC','PS5','PS4','Xbox','Switch','Mobile'];
+>>>>>>> 78e3417 (Mise à jour du profil Firestore et des règles Firestore)
+    }
   }
 }
