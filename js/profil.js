@@ -47,6 +47,33 @@ function afficherProfilData(profil) {
 // ============================================================
 //  Affichage du profil
 // ============================================================
+function setAuthentificationUI(user) {
+  var connexion = document.getElementById('connexion-section');
+  var profilSection = document.getElementById('profil-section');
+  var userEmail = document.getElementById('profil-user-email');
+
+  if (!connexion || !profilSection) return;
+
+  if (!user || user.isAnonymous) {
+    connexion.style.display = 'block';
+    profilSection.style.display = 'none';
+    if (userEmail) userEmail.textContent = '';
+    return;
+  }
+
+  connexion.style.display = 'none';
+  profilSection.style.display = 'block';
+  if (userEmail) userEmail.textContent = 'Connecté en tant que ' + (user.email || 'Utilisateur');
+}
+
+function afficherMessageConnexion(message, isErreur) {
+  var messageEl = document.getElementById('connexion-message');
+  if (!messageEl) return;
+  messageEl.textContent = message;
+  messageEl.style.display = 'block';
+  messageEl.style.color = isErreur ? '#f44336' : '#00c853';
+}
+
 function afficherProfil() {
   var profil = getProfil();
   if (!profil) return;
@@ -59,13 +86,12 @@ function afficherProfil() {
 function demarrerFirebaseAuth() {
   if (typeof auth === 'undefined') return;
   auth.onAuthStateChanged(function(user) {
-    if (!user) {
-      connexionAnonyme(function() {
-        // Auth state listener déclenchera la suite
-      });
+    if (!user || user.isAnonymous) {
+      setAuthentificationUI(null);
       return;
     }
 
+    setAuthentificationUI(user);
     migrerProfilLocalStorage(user.uid, function() {
       getProfilFirestore(user.uid, function(profil) {
         if (!profil) {
@@ -174,13 +200,64 @@ function validerProfil() {
 // ============================================================
 document.addEventListener('DOMContentLoaded', function() {
   demarrerFirebaseAuth();
-  afficherProfil();
   afficherFavoris();
 
   var tokenInput   = document.getElementById('csrf-token');
   var tokenVisible = document.getElementById('csrf-token-visible');
   if (tokenInput)   tokenInput.value       = SESSION_TOKEN;
   if (tokenVisible) tokenVisible.textContent = SESSION_TOKEN;
+
+  var btnConnexion = document.getElementById('btn-connexion');
+  var btnInscription = document.getElementById('btn-inscription');
+  var btnDeconnexion = document.getElementById('btn-deconnexion');
+
+  if (btnConnexion) {
+    btnConnexion.addEventListener('click', function() {
+      var email = document.getElementById('connexion-email').value.trim();
+      var motDePasse = document.getElementById('connexion-password').value;
+      if (!email || !motDePasse) {
+        afficherMessageConnexion('Veuillez saisir un email et un mot de passe.', true);
+        return;
+      }
+      connexionUtilisateur(email, motDePasse, function(user, err) {
+        if (err) {
+          afficherMessageConnexion('Erreur de connexion : ' + err.message, true);
+          return;
+        }
+        afficherMessageConnexion('Connexion réussie.', false);
+      });
+    });
+  }
+
+  if (btnInscription) {
+    btnInscription.addEventListener('click', function() {
+      var email = document.getElementById('connexion-email').value.trim();
+      var motDePasse = document.getElementById('connexion-password').value;
+      if (!email || !motDePasse) {
+        afficherMessageConnexion('Veuillez saisir un email et un mot de passe.', true);
+        return;
+      }
+      inscrireUtilisateur(email, motDePasse, function(user, err) {
+        if (err) {
+          afficherMessageConnexion('Erreur d’inscription : ' + err.message, true);
+          return;
+        }
+        afficherMessageConnexion('Compte créé. Vous êtes connecté.', false);
+      });
+    });
+  }
+
+  if (btnDeconnexion) {
+    btnDeconnexion.addEventListener('click', function() {
+      deconnexionUtilisateur(function(err) {
+        if (err) {
+          afficherMessageConnexion('Erreur de déconnexion : ' + err.message, true);
+          return;
+        }
+        afficherMessageConnexion('Déconnecté.', false);
+      });
+    });
+  }
 
   var form = document.getElementById('form-profil');
   if (!form) return;
