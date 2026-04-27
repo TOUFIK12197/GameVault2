@@ -21,17 +21,41 @@
 
   <main class="profil-main">
 
-    <section class="profil-card">
-      <div class="profil-avatar" id="profil-avatar">🎮</div>
-      <div class="profil-infos">
-        <h1 id="profil-pseudo"></h1>
-        <p id="profil-email"></p>
-        <p id="profil-bio"></p>
-        <span class="badge badge-pc" id="profil-plateforme"></span>
+    <section class="connexion-section" id="connexion-section">
+      <h2>🔐 Connexion / Inscription</h2>
+      <p>Connectez-vous pour gérer votre profil et accéder à vos modifications.</p>
+      <div class="form-group">
+        <label for="connexion-email">Email</label>
+        <input type="email" id="connexion-email" placeholder="votre@email.fr">
       </div>
+      <div class="form-group">
+        <label for="connexion-password">Mot de passe</label>
+        <input type="password" id="connexion-password" placeholder="******">
+      </div>
+      <div class="form-actions">
+        <button type="button" class="btn btn-primary" id="btn-connexion">Se connecter</button>
+        <button type="button" class="btn btn-secondary" id="btn-inscription">Créer un compte</button>
+      </div>
+      <div id="connexion-message" class="message-succes" style="display:none;"></div>
     </section>
 
-    <section class="favoris-section">
+    <div id="profil-section" style="display:none;">
+      <section class="profil-card">
+        <div class="profil-avatar" id="profil-avatar">🎮</div>
+        <div class="profil-infos">
+          <h1 id="profil-pseudo"></h1>
+          <p id="profil-email"></p>
+          <p id="profil-bio"></p>
+          <span class="badge badge-pc" id="profil-plateforme"></span>
+        </div>
+      </section>
+
+      <div class="profil-userbar">
+        <span id="profil-user-email"></span>
+        <button type="button" class="btn btn-secondary" id="btn-deconnexion">Se déconnecter</button>
+      </div>
+
+      <section class="favoris-section">
       <h2>❤️ Mes jeux favoris</h2>
       <div class="jeux-grid" id="favoris-grid">
         <p class="chargement">⏳ Chargement...</p>
@@ -112,6 +136,7 @@
         </div>
       </form>
     </section>
+  </div>
 
   </main>
 
@@ -120,11 +145,15 @@
   </footer>
 
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-  <script src="js/data.js"></script>
-  <script src="js/catalogue.js"></script>
-  <script src="js/profil.js"></script>
+  <script src="js/apiService.js"></script>
+  <script src="js/catalogueView.js"></script>
+  <script src="js/profilController.js"></script>
+  <script>
+    if (window.location.protocol.indexOf('http') === 0) {
+      activerBackendApi('/api');
+    }
+  </script>
 
 </body>
 </html>

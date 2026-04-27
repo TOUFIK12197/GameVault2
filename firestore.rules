@@ -29,6 +29,20 @@ service cloud.firestore {
 
       allow update, delete: if request.auth != null
         && request.auth.uid == resource.data.auteurId;
+
+      allow update: if request.auth != null
+        && request.resource.data.diff(resource.data).changedKeys().hasOnly(['favoris'])
+        && request.resource.data.favoris is bool;
+
+      allow update: if request.auth != null
+        && request.resource.data.diff(resource.data).changedKeys().hasOnly(['note'])
+        && request.resource.data.note is number
+        && request.resource.data.note >= 0
+        && request.resource.data.note <= 5;
+
+      allow update: if request.auth != null
+        && request.resource.data.diff(resource.data).changedKeys().hasOnly(['commentaires'])
+        && request.resource.data.commentaires is list;
     }
 
     match /utilisateurs/{uid} {
@@ -46,7 +60,6 @@ service cloud.firestore {
         && request.resource.data.bio.size() <= 200
         && request.resource.data.plateforme is string
         && request.resource.data.plateforme in ['PC','PS5','PS4','Xbox','Switch','Mobile'];
->>>>>>> 78e3417 (Mise à jour du profil Firestore et des règles Firestore)
     }
   }
 }
