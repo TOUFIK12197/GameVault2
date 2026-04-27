@@ -329,23 +329,35 @@ function soumettreInscription() {
       emailConfirme:   false
     };
 
-    // Utiliser upsertProfil via sauvegarderProfil existant
-    sauvegarderProfil(user.uid, donneesBackend, function(err) {
-      afficherLoader(false);
+    // POST pour créer le profil
+fetch('/api/profils', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify(donneesBackend)
+})
+.then(function(response) {
+  return response.json();
+})
+.then(function(result) {
+  afficherLoader(false);
+  console.log('Profil créé dans le backend:', result);
 
-      if (err) {
-        console.warn('Profil backend non sauvegardé:', err);
-        // On continue quand même, Firebase Auth a fonctionné
-      }
+  // Afficher l'étape confirmation
+  var emailAffiche = document.getElementById('email-affiche');
+  if (emailAffiche) emailAffiche.textContent = user.email;
 
-      // 4. Afficher l'étape confirmation
-      var emailAffiche = document.getElementById('email-affiche');
-      if (emailAffiche) emailAffiche.textContent = user.email;
+  allerEtape(3);
+})
+.catch(function(err) {
+  afficherLoader(false);
+  console.warn('Profil backend non sauvegardé:', err);
 
-      allerEtape(3);
-    });
-  });
-}
+  // On continue quand même vers étape 3
+  var emailAffiche = document.getElementById('email-affiche');
+  if (emailAffiche) emailAffiche.textContent = user.email;
+
+  allerEtape(3);
+});
 
 // ============================================================
 // TRADUCTION ERREURS FIREBASE
