@@ -211,26 +211,9 @@ document.addEventListener('DOMContentLoaded', function() {
       });
     });
   }
-
-  if (btnInscription) {
-    btnInscription.addEventListener('click', function() {
-      var email = document.getElementById('connexion-email').value.trim();
-      var motDePasse = document.getElementById('connexion-password').value;
-      if (!email || !motDePasse) {
-        afficherMessageConnexion('Veuillez saisir un email et un mot de passe.', true);
-        return;
-      }
-      inscrireUtilisateur(email, motDePasse, function(user, err) {
-        if (err) {
-          afficherMessageConnexion('Erreur d’inscription : ' + err.message, true);
-          return;
-        }
-        afficherMessageConnexion('Compte créé. Vous êtes connecté.', false);
-        setAuthentificationUI(user);
-        afficherFavoris();
-      });
-    });
-  }
+  
+// btn-inscription est maintenant un lien <a href="inscription.html">
+// plus besoin de gérer le clic ici
 
   if (btnDeconnexion) {
     btnDeconnexion.addEventListener('click', function() {
