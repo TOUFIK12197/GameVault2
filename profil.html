@@ -34,7 +34,8 @@
       </div>
       <div class="form-actions">
         <button type="button" class="btn btn-primary" id="btn-connexion">Se connecter</button>
-        <button type="button" class="btn btn-secondary" id="btn-inscription">Créer un compte</button>
+        <a href="inscription.html" class="btn btn-secondary">Créer un compte</a>
+        
       </div>
       <div id="connexion-message" class="message-succes" style="display:none;"></div>
     </section>
@@ -145,11 +146,15 @@
   </footer>
 
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-  <script src="js/data.js"></script>
-  <script src="js/catalogue.js"></script>
-  <script src="js/profil.js"></script>
+  <script src="js/apiService.js"></script>
+  <script src="js/catalogueView.js"></script>
+  <script src="js/profilController.js"></script>
+  <script>
+    if (window.location.protocol.indexOf('http') === 0) {
+      activerBackendApi('/api');
+    }
+  </script>
 
 </body>
 </html>

@@ -13,11 +13,34 @@ const firebaseConfig = {
 };
 
 // Initialiser Firebase
-if (!firebase.apps.length) {
+if (typeof firebase !== 'undefined' && firebase.apps && !firebase.apps.length) {
   firebase.initializeApp(firebaseConfig);
 }
-var db = firebase.firestore();
-var auth = firebase.auth();
+var db = typeof firebase !== 'undefined' ? firebase.firestore() : null;
+var auth = typeof firebase !== 'undefined' ? firebase.auth() : null;
+
+var backendMode = false;
+var backendBaseUrl = '/api';
+
+function activerBackendApi(baseUrl) {
+  backendMode = true;
+  backendBaseUrl = baseUrl || '/api';
+}
+
+function backendFetch(route, options) {
+  options = options || {};
+  options.headers = Object.assign({ 'Content-Type': 'application/json' }, options.headers || {});
+  return fetch(backendBaseUrl + route, options)
+    .then(function(response) {
+      if (!response.ok) {
+        return response.text().then(function(text) {
+          throw new Error('API error ' + response.status + ': ' + (text || response.statusText));
+        });
+      }
+      if (response.status === 204) return null;
+      return response.json();
+    });
+}
 
 function getCurrentUserId() {
   return auth && auth.currentUser ? auth.currentUser.uid : null;
@@ -241,9 +264,16 @@ var JEUX_PAR_DEFAUT = [
 ];
 
 // ============================================================
-//  Initialiser Firestore avec les données par défaut
+//  Initialiser Firestore ou backend avec les données par défaut
 // ============================================================
 function initialiserDonnees(callback) {
+  if (backendMode) {
+    // Le backend lit déjà le fichier local de données.
+    console.log('Backend API activé → initialisation côté serveur');
+    if (callback) callback();
+    return;
+  }
+
   db.collection('jeux').limit(1).get()
     .then(function(snapshot) {
       if (snapshot.empty) {
@@ -271,6 +301,19 @@ function initialiserDonnees(callback) {
 //  Récupérer tous les jeux
 // ============================================================
 function getJeux(callback) {
+  if (backendMode) {
+    backendFetch('/jeux')
+      .then(function(jeux) {
+        console.log('Jeux récupérés depuis backend : ' + jeux.length);
+        if (callback) callback(jeux);
+      })
+      .catch(function(err) {
+        console.error('Erreur getJeux backend:', err);
+        if (callback) callback([]);
+      });
+    return;
+  }
+
   db.collection('jeux').get()
     .then(function(snapshot) {
       var jeux = [];
@@ -293,6 +336,18 @@ function getJeux(callback) {
 //  Récupérer un jeu par ID
 // ============================================================
 function getJeuById(id, callback) {
+  if (backendMode) {
+    backendFetch('/jeux/' + encodeURIComponent(id))
+      .then(function(jeu) {
+        if (callback) callback(jeu);
+      })
+      .catch(function(err) {
+        console.error('Erreur getJeuById backend:', err);
+        if (callback) callback(null);
+      });
+    return;
+  }
+
   db.collection('jeux').doc(id).get()
     .then(function(doc) {
       if (doc.exists) {
@@ -314,10 +369,9 @@ function getJeuById(id, callback) {
 //  Ajouter un jeu
 // ============================================================
 function ajouterJeu(nouveauJeu, callback) {
-  var user = auth.currentUser;
-  if (!user) {
-    console.error('Impossible d’ajouter un jeu : utilisateur non connecté.');
-    return;
+  var user = auth && auth.currentUser ? auth.currentUser : null;
+  if (!user && backendMode) {
+    console.warn('Backend API activé : ajout de jeu sans authentification Firebase.');
   }
 
   nouveauJeu.commentaires = [];
@@ -325,15 +379,28 @@ function ajouterJeu(nouveauJeu, callback) {
   nouveauJeu.note         = nouveauJeu.note || 0;
   nouveauJeu.image        = nouveauJeu.image || 'images/jeux/default.jpg';
   nouveauJeu.dateAjout    = new Date().toISOString();
-  nouveauJeu.auteurId     = user.uid;
+  nouveauJeu.auteurId     = user ? user.uid : null;
 
-  // ✅ S'assurer que lienTelechargement est toujours présent
   if (nouveauJeu.lienTelechargement === undefined ||
       nouveauJeu.lienTelechargement === null) {
     nouveauJeu.lienTelechargement = '';
   }
 
   console.log('Jeu à sauvegarder :', nouveauJeu);
+
+  if (backendMode) {
+    backendFetch('/jeux', {
+      method: 'POST',
+      body: JSON.stringify(nouveauJeu)
+    })
+      .then(function(result) {
+        if (callback) callback(result.id);
+      })
+      .catch(function(err) {
+        console.error('Erreur ajouterJeu backend:', err);
+      });
+    return;
+  }
 
   db.collection('jeux').add(nouveauJeu)
     .then(function(docRef) {
@@ -349,6 +416,18 @@ function ajouterJeu(nouveauJeu, callback) {
 //  Supprimer un jeu
 // ============================================================
 function supprimerJeu(id, callback) {
+  if (backendMode) {
+    backendFetch('/jeux/' + encodeURIComponent(id), { method: 'DELETE' })
+      .then(function() {
+        console.log('Jeu supprimé backend : ' + id);
+        if (callback) callback();
+      })
+      .catch(function(err) {
+        console.error('Erreur supprimerJeu backend:', err);
+      });
+    return;
+  }
+
   db.collection('jeux').doc(id).delete()
     .then(function() {
       console.log('Jeu supprimé : ' + id);
@@ -363,6 +442,20 @@ function supprimerJeu(id, callback) {
 //  Mettre à jour un jeu
 // ============================================================
 function mettreAJourJeu(id, donnees, callback) {
+  if (backendMode) {
+    backendFetch('/jeux/' + encodeURIComponent(id), {
+      method: 'PUT',
+      body: JSON.stringify(donnees)
+    })
+      .then(function() {
+        if (callback) callback();
+      })
+      .catch(function(err) {
+        console.error('Erreur mettreAJourJeu backend:', err);
+      });
+    return;
+  }
+
   db.collection('jeux').doc(id).update(donnees)
     .then(function() {
       if (callback) callback();
@@ -390,7 +483,27 @@ function toggleFavori(id, callback) {
 //  Ajouter un commentaire
 // ============================================================
 function ajouterCommentaire(jeuId, commentaire, callback) {
-  var user = auth.currentUser;
+  var user = auth && auth.currentUser ? auth.currentUser : null;
+
+  if (backendMode) {
+    var payload = {
+      auteur: commentaire.auteur,
+      texte: commentaire.texte,
+      auteurId: user ? user.uid : null
+    };
+    backendFetch('/jeux/' + encodeURIComponent(jeuId) + '/commentaires', {
+      method: 'POST',
+      body: JSON.stringify(payload)
+    })
+      .then(function(commentaires) {
+        if (callback) callback(commentaires);
+      })
+      .catch(function(err) {
+        console.error('Erreur ajouterCommentaire backend:', err);
+      });
+    return;
+  }
+
   getJeuById(jeuId, function(jeu) {
     if (jeu) {
       var commentaires = jeu.commentaires || [];
@@ -412,6 +525,19 @@ function ajouterCommentaire(jeuId, commentaire, callback) {
 //  Supprimer un commentaire
 // ============================================================
 function supprimerCommentaireDB(jeuId, commentaireId, callback) {
+  if (backendMode) {
+    backendFetch('/jeux/' + encodeURIComponent(jeuId) + '/commentaires/' + encodeURIComponent(commentaireId), {
+      method: 'DELETE'
+    })
+      .then(function(commentaires) {
+        if (callback) callback(commentaires);
+      })
+      .catch(function(err) {
+        console.error('Erreur supprimerCommentaireDB backend:', err);
+      });
+    return;
+  }
+
   getJeuById(jeuId, function(jeu) {
     if (jeu) {
       var nouveaux = [];
