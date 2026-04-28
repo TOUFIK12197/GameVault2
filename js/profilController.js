@@ -211,10 +211,9 @@ document.addEventListener('DOMContentLoaded', function() {
       });
     });
   }
-  
+
 // btn-inscription est maintenant un lien <a href="inscription.html">
 // plus besoin de gérer le clic ici
-
   if (btnDeconnexion) {
     btnDeconnexion.addEventListener('click', function() {
       deconnexionUtilisateur(function(err) {
