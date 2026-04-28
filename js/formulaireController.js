@@ -135,8 +135,8 @@ document.addEventListener('DOMContentLoaded', function() {
         this.value = '';
         return;
       }
-      if (fichier.size > 2 * 1024 * 1024) {
-        erreur.textContent = '⚠️ Image trop lourde (max 2 Mo).';
+      if (fichier.size > 4 * 1024 * 1024) {
+        erreur.textContent = '⚠️ Image trop lourde (max 4 Mo).';
         erreur.style.display = 'block';
         preview.src = 'images/jeux/default.jpg';
         this.value = '';
